@@ -11,7 +11,7 @@ dataset_mixer:
 dataset_splits:
 - train_sft
 - test_sft
-preprocessing_num_workers: 2
+preprocessing_num_workers: 16
 
 # SFT trainer config
 tf32: true
