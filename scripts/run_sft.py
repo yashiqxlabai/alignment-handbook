@@ -47,6 +47,7 @@ from accelerate import Accelerator
 import accelerate
 accelerator = Accelerator(kwargs_handlers=[accelerate.DistributedDataParallelKwargs(find_unused_parameters=True)])
 import os 
+from sklearn.model_selection import train_test_split
 
 logger = logging.getLogger(__name__)
 
@@ -163,14 +164,16 @@ def main():
     # Decontaminate benchmarks
     ##########################
     num_raw_train_samples = len(raw_datasets["train"])
+    print(num_raw_train_samples)i
     raw_datasets = raw_datasets.filter(decontaminate_humaneval, batched=True, batch_size=10_000, num_proc=1)
     num_filtered_train_samples = num_raw_train_samples - len(raw_datasets["train"])
-    logger.info(
-        f"Decontaminated {num_filtered_train_samples} ({num_filtered_train_samples/num_raw_train_samples * 100:.2f}%) samples from the training set."
-    )
+    #logger.info(
+    #    f"Decontaminated {num_filtered_train_samples} ({num_filtered_train_samples/num_raw_train_samples * 100:.2f}%) samples from the training set."
+    #)
 
-    train_dataset = raw_datasets["train"]
-    eval_dataset = raw_datasets["test"]
+    train_split = raw_datasets["train"]
+    train_dataset, eval_dataset = train_test_split(train_split,test_size=0.3)
+
 
     with training_args.main_process_first(desc="Log a few random samples from the processed training set"):
         for index in random.sample(range(len(raw_datasets["train"])), 3):
@@ -202,7 +205,7 @@ def main():
         checkpoint = training_args.resume_from_checkpoint
     elif last_checkpoint is not None:
         checkpoint = last_checkpoint
-    train_result = trainer.train(resume_from_checkpoint=checkpoint)
+    train_result = trainer.train(resume_from_checkpoint=None)
     metrics = train_result.metrics
     metrics["train_samples"] = len(train_dataset)
     trainer.log_metrics("train", metrics)
