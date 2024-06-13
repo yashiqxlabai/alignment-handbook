@@ -61,6 +61,8 @@ def main():
     local_rank = int(os.environ['LOCAL_RANK'])
     is_distributed = world_size > 1
     
+    n = torch.cuda.device_count() // 4
+    device_ids = list(range(local_rank * n, (local_rank + 1) * n))
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # Set seed for reproducibility
@@ -142,7 +144,7 @@ def main():
     model_kwargs = None
 
     model = model.to(device)
-    model = DDP(model, device_ids=[device], output_device=device)
+    model = DDP(model, device_ids, output_device=device)
 
     #####################
     # Apply chat template
