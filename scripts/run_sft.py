@@ -146,9 +146,9 @@ def main():
     model_kwargs = None
     
     model = model.to(device)
-    # model = DDP(model, device_ids, output_device=device)
-    with enable_wrap(wrapper_cls=FSDP, reshard_after_forward=True, mixed_precision=True, move_params_to_cpu=True):
-        model = wrap(model)
+    model = DDP(model, device_ids, output_device=device)
+    # with enable_wrap(wrapper_cls=FSDP, reshard_after_forward=True, mixed_precision=True, move_params_to_cpu=True):
+    #     model = wrap(model)
         
     #####################
     # Apply chat template
