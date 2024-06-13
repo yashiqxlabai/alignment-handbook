@@ -171,9 +171,10 @@ def main():
     #    f"Decontaminated {num_filtered_train_samples} ({num_filtered_train_samples/num_raw_train_samples * 100:.2f}%) samples from the training set."
     #)
 
-    train_split = raw_datasets["train"]
-    train_dataset, eval_dataset = train_test_split(train_split,test_size=0.3)
-
+    #train_split = raw_datasets["train"]
+    #train_dataset, eval_dataset = train_test_split(train_split,test_size=0.3)
+    train_dataset= raw_datasets["train"]
+    eval_dataset= raw_datasets["test"]
 
     with training_args.main_process_first(desc="Log a few random samples from the processed training set"):
         for index in random.sample(range(len(raw_datasets["train"])), 3):
