@@ -54,7 +54,7 @@ from fairscale.nn.wrap import auto_wrap, enable_wrap, wrap, default_auto_wrap_po
 logger = logging.getLogger(__name__)
 
 # Define a policy to wrap layers with more than a specific number of parameters 
-def custom_auto_wrap_policy(module, recurse, unwrapped_params):
+def custom_auto_wrap_policy(module, recurse, unwrapped_params, module_is_root):
         return unwrapped_params >= 1e6  # example threshold
 
 def main():
