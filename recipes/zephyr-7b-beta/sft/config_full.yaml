@@ -1,7 +1,7 @@
 # Model arguments
 model_name_or_path: Qwen/Qwen1.5-7B
 model_revision: main
-torch_dtype: bfloat16
+torch_dtype: float16
 use_flash_attention_2: true
 
 # Data training arguments
@@ -14,7 +14,7 @@ dataset_splits:
 preprocessing_num_workers: 16
 
 # SFT trainer config
-tf32: true
+fp16: true
 do_eval: true
 evaluation_strategy: epoch
 gradient_accumulation_steps: 1
