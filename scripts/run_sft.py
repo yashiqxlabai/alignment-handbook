@@ -155,10 +155,10 @@ def main():
     # with enable_wrap(wrapper_cls=FSDP, auto_wrap_policy=custom_auto_wrap_policy, mixed_precision = False):
     #     model = auto_wrap(model)
  
-    model = model.cuda()
     with enable_wrap(wrapper_cls=FSDP, reshard_after_forward=True, mixed_precision=True, move_params_to_cpu=True):
         model = wrap(model)
-        
+    model = model.cuda()
+
     #####################
     # Apply chat template
     #####################
