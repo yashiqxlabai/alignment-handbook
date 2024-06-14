@@ -14,7 +14,7 @@ dataset_splits:
 preprocessing_num_workers: 16
 
 # SFT trainer config
-fp32: true
+tf32: true
 do_eval: true
 evaluation_strategy: epoch
 gradient_accumulation_steps: 1
