@@ -220,6 +220,7 @@ def main():
         checkpoint = training_args.resume_from_checkpoint
     elif last_checkpoint is not None:
         checkpoint = last_checkpoint
+    print('\nLength of train ds: ', len(train_dataset))
     train_result = trainer.train(resume_from_checkpoint=None)
     metrics = train_result.metrics
     metrics["train_samples"] = len(train_dataset)
