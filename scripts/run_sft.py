@@ -152,7 +152,7 @@ def main():
     # model = DDP(model, device_ids, output_device=device)
  
     # Enable wrapping context with a custom policy
-    with enable_wrap(wrapper_cls=FSDP, auto_wrap_policy=custom_auto_wrap_policy):
+    with enable_wrap(wrapper_cls=FSDP, auto_wrap_policy=custom_auto_wrap_policy, mixed_precision = False):
         model = auto_wrap(model)
  
     model = model.cuda()
