@@ -155,7 +155,7 @@ def main():
     # with enable_wrap(wrapper_cls=FSDP, auto_wrap_policy=custom_auto_wrap_policy, mixed_precision = False):
     #     model = auto_wrap(model)
  
-    with enable_wrap(wrapper_cls=FSDP, reshard_after_forward=True, mixed_precision=True, force_input_to_fp32, move_params_to_cpu=True):
+    with enable_wrap(wrapper_cls=FSDP, reshard_after_forward=True, mixed_precision=True, force_input_to_fp32=True, move_params_to_cpu=True):
         model = wrap(model)
     model = model.cuda()
 
