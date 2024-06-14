@@ -49,10 +49,13 @@ accelerator = Accelerator(kwargs_handlers=[accelerate.DistributedDataParallelKwa
 import os 
 from sklearn.model_selection import train_test_split
 from fairscale.nn.data_parallel import FullyShardedDataParallel as FSDP
-from fairscale.nn.wrap import auto_wrap, enable_wrap, wrap
+from fairscale.nn.wrap import auto_wrap, enable_wrap, wrap, default_auto_wrap_policy
 
 logger = logging.getLogger(__name__)
 
+# Define a policy to wrap layers with more than a specific number of parameters 
+def custom_auto_wrap_policy(module, recurse, unwrapped_params):
+        return unwrapped_params >= 1e6  # example threshold
 
 def main():
     parser = H4ArgumentParser((ModelArguments, DataArguments, SFTConfig))
@@ -147,8 +150,14 @@ def main():
     
     # model = model.to(device)
     # model = DDP(model, device_ids, output_device=device)
-    with enable_wrap(wrapper_cls=FSDP, reshard_after_forward=True, mixed_precision=True, move_params_to_cpu=True):
-        model = wrap(model)
+ 
+    # Enable wrapping context with a custom policy
+    with enable_wrap(wrapper_cls=FSDP, auto_wrap_policy=custom_auto_wrap_policy):
+        model = auto_wrap(model)
+ 
+    model = model.cuda()
+    # with enable_wrap(wrapper_cls=FSDP, reshard_after_forward=True, mixed_precision=True, move_params_to_cpu=True):
+    #     model = wrap(model)
         
     #####################
     # Apply chat template
