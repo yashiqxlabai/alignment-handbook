@@ -129,7 +129,8 @@ def main():
         model_args.torch_dtype if model_args.torch_dtype in ["auto", None] else getattr(torch, model_args.torch_dtype)
     )
     quantization_config = get_quantization_config(model_args)
-    print("\nTorch_Dtype ", (getattr(torch, model_args.torch_dtype)))
+
+
     model_kwargs = dict(
         revision=model_args.model_revision,
         trust_remote_code=model_args.trust_remote_code,
@@ -147,17 +148,17 @@ def main():
     model = AutoModelForCausalLM.from_pretrained(model_args.model_name_or_path, **model_kwargs)
     model, tokenizer = setup_chat_format(model, tokenizer)
     model_kwargs = None
-    
-    # model = model.to(device)
-    # model = DDP(model, device_ids, output_device=device)
+    print(">>>>>>>>>>>>>>>>>>", device_ids)
+    model = model.to(device)
+    model = DDP(model, device_ids, output_device=device)
  
     # Enable wrapping context with a custom policy
     # with enable_wrap(wrapper_cls=FSDP, auto_wrap_policy=custom_auto_wrap_policy, mixed_precision = False):
     #     model = auto_wrap(model)
  
-    with enable_wrap(wrapper_cls=FSDP, reshard_after_forward=True, mixed_precision=False, move_params_to_cpu=True):
-        model = wrap(model)
-    model = model.cuda()
+    #with enable_wrap(wrapper_cls=FSDP, reshard_after_forward=True, mixed_precision=False, move_params_to_cpu=True):
+    #    model = wrap(model)
+    #model = model.to("cuda")
 
     #####################
     # Apply chat template
@@ -179,7 +180,7 @@ def main():
     ##########################
     num_raw_train_samples = len(raw_datasets["train"])
     print(num_raw_train_samples)
-    raw_datasets = raw_datasets.filter(decontaminate_humaneval, batched=True, batch_size=10_000, num_proc=1)
+    raw_datasets = raw_datasets.filter(decontaminate_humaneval, batched=True, batch_size=4, num_proc=1)
     num_filtered_train_samples = num_raw_train_samples - len(raw_datasets["train"])
     #logger.info(
     #    f"Decontaminated {num_filtered_train_samples} ({num_filtered_train_samples/num_raw_train_samples * 100:.2f}%) samples from the training set."
@@ -210,6 +211,11 @@ def main():
         peft_config=get_peft_config(model_args),
         dataset_kwargs=training_args.dataset_kwargs,
     )
+
+    torch.cuda.empty_cache()
+    import gc
+    gc.collect()
+
 
     ###############
     # Training loop
